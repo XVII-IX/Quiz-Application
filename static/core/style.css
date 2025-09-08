@@ -1,0 +1,35 @@
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    padding-top: 0px;
+    background-color: #f8f9fa;
+}
+
+.card {
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.3rem;
+}
+
+.navbar {
+    margin-top: 0 !important;
+}
+.navbar {
+    background: rgba(0, 0, 0, 0.3); /* Transparent look */
+    backdrop-filter: blur(10px);
+}
+
+.navbar .nav-link {
+    font-size: 1.1rem;
+    transition: color 0.3s ease;
+}
+
+.navbar .nav-link:hover {
+    color: #00f2ff; /* Neon blue hover */
+}

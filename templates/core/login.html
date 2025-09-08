@@ -1,0 +1,191 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- 3D Background Canvas -->
+<canvas id="bgCanvas"></canvas>
+
+<style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow: hidden;
+        font-family: 'Poppins', sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #0d0d0d;
+    }
+
+    #bgCanvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+    }
+
+    .login-box {
+        position: relative;
+        width: 400px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        padding: 30px;
+        border-radius: 20px;
+        text-align: center;
+        color: #fff;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+        animation: fadeIn 1s ease-in-out;
+        z-index: 10;
+    }
+
+    .login-box::before {
+        content: '';
+        position: absolute;
+        top: -10px;
+        left: -10px;
+        right: -10px;
+        bottom: -10px;
+        background: linear-gradient(45deg, #00c6ff, #0072ff, #ff00ff);
+        border-radius: 25px;
+        z-index: -1;
+        opacity: 0.3;
+        filter: blur(30px);
+        animation: glow 3s infinite alternate;
+    }
+
+    .login-box h2 {
+        margin-bottom: 20px;
+        font-weight: 600;
+    }
+
+    .form-control {
+        background: rgba(255, 255, 255, 0.15);
+        border: none;
+        color: #fff;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        padding: 12px;
+        width: 100%;
+    }
+
+    .form-control::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .btn-primary {
+        background: linear-gradient(45deg, #00c6ff, #0072ff);
+        border: none;
+        border-radius: 10px;
+        padding: 12px;
+        font-size: 16px;
+        color: #fff;
+        width: 100%;
+        transition: 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: scale(1.05);
+        background: linear-gradient(45deg, #0072ff, #00c6ff);
+    }
+
+    .text-center a {
+        color: #00c6ff;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .text-center a:hover {
+        text-decoration: underline;
+    }
+
+    @keyframes fadeIn {
+        0% {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    @keyframes glow {
+        0% { opacity: 0.3; }
+        100% { opacity: 0.6; }
+    }
+</style>
+
+<div class="login-box">
+    <h2>Login</h2>
+
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+
+    <form method="POST">
+        {% csrf_token %}
+        <input type="text" name="username" required class="form-control" placeholder="Username">
+        <input type="password" name="password" required class="form-control" placeholder="Password">
+        <button type="submit" class="btn btn-primary btn-block">Login</button>
+    </form>
+
+    <div class="text-center mt-3">
+        Don't have an account? <a href="{% url 'register' %}">Register here</a>
+    </div>
+</div>
+
+<!-- Three.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<!-- Animated 3D Background -->
+<script>
+    const canvas = document.getElementById('bgCanvas');
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 5;
+
+    // Particles
+    const geometry = new THREE.BufferGeometry();
+    const vertices = [];
+
+    for (let i = 0; i < 12000; i++) {
+        const x = (Math.random() - 0.5) * 400;
+        const y = (Math.random() - 0.5) * 400;
+        const z = (Math.random() - 0.5) * 400;
+        vertices.push(x, y, z);
+    }
+
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+
+    const material = new THREE.PointsMaterial({
+        color: 0x00c6ff,
+        size: 1,
+        transparent: true,
+        opacity: 0.8
+    });
+
+    const points = new THREE.Points(geometry, material);
+    scene.add(points);
+
+    function animate() {
+        requestAnimationFrame(animate);
+        points.rotation.x += 0.0007;
+        points.rotation.y += 0.001;
+        renderer.render(scene, camera);
+    }
+
+    animate();
+
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+</script>
+{% endblock %}
