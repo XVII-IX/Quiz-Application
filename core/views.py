@@ -91,16 +91,15 @@ def start_quiz(request, quiz_id):
 
     if quiz.status != 'active':
         messages.warning(request, "This quiz is not currently active.")
-        return redirect('quizzes_by_category')
+        return redirect('category_quizzes', category_id=quiz.category.id)
 
-    questions = Question.objects.filter(quiz=quiz).order_by('?')
-    return render(request, 'core/quiz_attempt.html', {
-        'quiz': quiz,
-        'questions': questions,
-        'total_questions': questions.count()
-    })
+    # Initialize quiz session
+    request.session['quiz_id'] = quiz.id
+    request.session['question_index'] = 0
+    request.session['score'] = 0
+    request.session['answers'] = {}
 
-
+    return redirect('attempt_quiz')
 
 
 
